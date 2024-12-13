@@ -1,0 +1,94 @@
+/* General reset and body styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f8c8dc, #e7b0c0);
+    color: #333;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Container for the entire content */
+.container {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Title styling */
+.title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #ff6f61;
+    margin-bottom: 15px;
+}
+
+/* Subtitle styling */
+.subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    font-style: italic;
+    color: #555;
+}
+
+/* Heart shape styling */
+.heart-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.heart {
+    width: 45px;
+    height: 45px;
+    background-color: #ff6f61;
+    position: relative;
+    transform: rotate(-45deg);
+}
+
+.heart::before, .heart::after {
+    content: '';
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    background-color: #ff6f61;
+    border-radius: 50%;
+}
+
+.heart::before {
+    top: -25px;
+    left: 0;
+}
+
+.heart::after {
+    left: 25px;
+    top: 0;
+}
+
+/* Button styling */
+.cta-button {
+    padding: 12px 30px;
+    background-color: #ff6f61;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #ff4b39;
+}
