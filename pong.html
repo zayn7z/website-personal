@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game for Fun</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            height: 100vh;
+            background-color: rgb(3, 19, 71);
+            margin: 0;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid white;
+        }
+        #playAgain {
+            display: none; /* Sembunyikan teks PLAY AGAIN pada awal */
+            font-size: 24px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Pong Satu Pemain</h1>
+    <canvas id="pong" width="600" height="800" style="display: none;"></canvas>
+    <div id="playAgain">PLAY AGAIN</div>
+    
+    <script>
+        const canvas = document.getElementById("pong");
+        const context = canvas.getContext("2d");
+        const playAgainText = document.getElementById("playAgain");
+
+        // Paddle
+        const paddleWidth = 100;
+        const paddleHeight = 10;
+        const paddle = {
+            x: canvas.width / 2 - paddleWidth / 2,
+            y: canvas.height - paddleHeight - 10,
+            width: paddleWidth,
+            height: paddleHeight,
+            color: "blue"
+        };
+
+        // Ball (Gambar orang)
+        const ball = {
+            x: canvas.width / 2,
+            y: 30,
+            radius: 30, // Ukuran bola yang lebih besar
+            image: new Image(),
+            initialVelocityX: 2, // Kecepatan awal horizontal
+            initialVelocityY: 2, // Kecepatan awal vertikal
+            velocityX: 2,
+            velocityY: 2,
+            color: "white",
+            isMoving: true // Menandakan apakah bola sedang bergerak
+        };
+
+        // Ganti dengan URL gambar orang yang bulat
+        ball.image.src = 'cute.jpg'; // Ganti dengan URL gambar Anda
+
+        let speedIncreaseInterval; // Interval untuk meningkatkan kecepatan bola
+        let score = 0; // Variabel untuk menyimpan skor
+
+        // Draw function
+        function draw() {
+            // Clear canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw paddle
+            context.fillStyle = paddle.color;
+            context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+
+            // Draw ball (gambar orang)
+            context.drawImage(ball.image, ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2);
+
+            // Draw score
+            drawScore();
+        }
+
+        // Function to draw the score
+        function drawScore() {
+            context.fillStyle = "rgba(255, 255, 255, 0.7)"; // Warna putih dengan transparansi
+            context.font = "40px Arial";
+            context.textAlign = "center";
+            context.fillText(score, canvas.width / 2, canvas.height / 2);
+        }
+
+        // Update function
+        function update() {
+            if (ball.isMoving) {
+                ball.x += ball.velocityX;
+                ball.y += ball.velocityY;
+
+                // Ball collision with top
+                if (ball.y - ball.radius < 0) {
+                    ball.velocityY = -ball.velocityY;
+                }
+
+                // Ball collision with paddle
+                if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) {
+                    ball.velocityY = -ball.velocityY;
+                    // Tidak menambah kecepatan bola saat dihalang
+                }
+
+                // Ball falls below paddle
+                if (ball.y + ball.radius > canvas.height) {
+                    score = 1; // Reset skor menjadi satu
+                    ball.isMoving = false; // Hentikan bola
+                    showPlayAgain(); // Tampilkan tombol PLAY AGAIN
+                    clearInterval(speedIncreaseInterval); // Hentikan interval saat game over
+                }
+
+                // Ball collision with left and right walls
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                    ball.velocityX = -ball.velocityX;
+                }
+            }
+        }
+
+        // Meningkatkan kecepatan bola setiap 15 detik
+        function startSpeedIncreaseInterval() {
+            speedIncreaseInterval = setInterval(() => {
+                if (ball.isMoving) {
+                    ball.velocityY *= 1.05; // Meningkatkan kecepatan vertikal
+                    ball.velocityX *= 1.05; // Meningkatkan kecepatan horizontal
+                }
+            }, 15000); // 15 detik
+        }
+
+        // Control paddle
+        document.addEventListener("keydown", (event) => {
+            switch (event.key) {
+                case "ArrowLeft":
+                    if (paddle.x > 0) paddle.x -= 20;
+                    break;
+                case "ArrowRight":
+                    if (paddle.x < canvas.width - paddle.width) paddle.x += 20;
+                    break;
+                case "Enter": // Menekan Enter untuk memulai kembali
+                    if (!ball.isMoving) {
+                        startGame();
+                    }
+                    break;
+            }
+        });
+
+        // Show the game canvas and hide buttons
+        function startGame() {
+            canvas.style.display = "block";
+            playAgainText.style.display = "none"; // Sembunyikan teks PLAY AGAIN
+            resetGame();
+            startSpeedIncreaseInterval(); // Mulai interval peningkatan kecepatan
+            gameLoop();
+        }
+
+        // Show the PLAY AGAIN text
+        function showPlayAgain() {
+            playAgainText.style.display = "block";
+        }
+
+        // Reset game state
+        function resetGame() {
+            paddle.x = canvas.width / 2 - paddleWidth / 2;
+            ball.x = canvas.width / 2;
+            ball.y = 30;
+            ball.velocityX = ball.initialVelocityX; // Reset kecepatan horizontal ke nilai awal
+            ball.velocityY = ball.initialVelocityY; // Reset kecepatan vertikal ke nilai awal
+            ball.isMoving = true; // Set bola untuk bergerak
+            score = 0; // Reset skor
+        }
+        // Update function
+function update() {
+    if (ball.isMoving) {
+        ball.x += ball.velocityX;
+        ball.y += ball.velocityY;
+
+        // Ball collision with top
+        if (ball.y - ball.radius < 0) {
+            ball.velocityY = -ball.velocityY;
+        }
+
+        // Ball collision with paddle
+        if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) {
+            ball.velocityY = -ball.velocityY;
+            // Tidak menambah kecepatan bola saat dihalang
+        }
+
+        // Ball falls below paddle
+        if (ball.y + ball.radius > canvas.height) {
+            score = 1; // Reset skor menjadi satu
+            ball.isMoving = false; // Hentikan bola
+            showPlayAgain(); // Tampilkan tombol PLAY AGAIN
+            clearInterval(speedIncreaseInterval); // Hentikan interval saat game over
+            
+            // Redirect to the main page (can be replaced with your desired URL)
+            setTimeout(function() {
+                window.location.href = 'testing2.html'; // Ganti dengan URL halaman utama Anda
+            }, 3000); // Redirect after 3 seconds
+        }
+
+        // Ball collision with left and right walls
+        if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+            ball.velocityX = -ball.velocityX;
+        }
+    }
+}
+
+// Update function
+function update() {
+    if (ball.isMoving) {
+        ball.x += ball.velocityX;
+        ball.y += ball.velocityY;
+
+        // Ball collision with top
+        if (ball.y - ball.radius < 0) {
+            ball.velocityY = -ball.velocityY;
+        }
+
+        // Ball collision with paddle
+        if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) {
+            ball.velocityY = -ball.velocityY;
+            score += 1; // Increase the score by 1 each time the ball hits the paddle
+        }
+
+        // Ball falls below paddle
+        if (ball.y + ball.radius > canvas.height) {
+            score = 1; // Reset score to 1 when the ball falls below the paddle
+            ball.isMoving = false; // Stop the ball
+            showPlayAgain(); // Show the "Play Again" button
+            clearInterval(speedIncreaseInterval); // Stop the speed increase interval
+            
+            // Redirect to the main page (can be replaced with your desired URL)
+            setTimeout(function() {
+                window.location.href = 'testing2.html'; // Replace with your main page URL
+            }, 3000); // Redirect after 3 seconds
+        }
+
+        // Ball collision with left and right walls
+        if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+            ball.velocityX = -ball.velocityX;
+        }
+    }
+}
+
+// Function to draw the score
+// Function to draw the score
+function drawScore() {
+    context.fillStyle = "rgba(255, 255, 255, 0.7)"; // White color with transparency
+    context.font = "80px Arial"; // Increased font size to make the score bigger
+    context.textAlign = "center";
+    context.textBaseline = "middle"; // Center the text vertically as well
+    context.fillText(score, canvas.width / 2, canvas.height / 2); // Center the score on the canvas
+}
+
+        // Game loop
+        function gameLoop() {
+            draw();
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Event listener for PLAY AGAIN
+        playAgainText.addEventListener("click", startGame);
+
+        // Start the game on page load
+        startGame();
+    </script>
+</body>
+</html>
